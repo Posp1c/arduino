@@ -1,0 +1,98 @@
+#define CERVENA 9
+#define ZELENA 10
+#define MODRA 11
+int tl_pred = LOW;
+bool sepnuto = LOW;
+byte intenzita = 0;
+int pin = 9;
+bool smer = HIGH;
+bool smer_pred = HIGH;
+
+void setup()
+{
+  pinMode(2, INPUT_PULLUP);
+  pinMode(CERVENA, OUTPUT);
+  pinMode(ZELENA, OUTPUT);
+  pinMode(MODRA, OUTPUT);
+  tl_pred = digitalRead(2);
+}
+
+
+
+void loop()
+{
+  bool tlacitko = digitalRead(2);
+  if(tl_pred == HIGH && tlacitko  == LOW) {
+    sepnuto = !sepnuto;
+  }
+  tl_pred = tlacitko;
+  
+  if(sepnuto == HIGH) {
+    switch(pin) {
+case 1: {
+analogWrite(CERVENA, intenzita);
+break;
+}
+case 2: {
+analogWrite(ZELENA, intenzita);
+break;
+}
+case 3: {
+analogWrite(MODRA, intenzita);
+break;
+}
+case 4: {
+analogWrite(CERVENA, intenzita);
+analogWrite(ZELENA, intenzita);
+break;
+}
+case 5: {
+analogWrite(CERVENA, intenzita);
+analogWrite(MODRA, intenzita);
+break;
+}
+case 6: {
+analogWrite(ZELENA, intenzita);
+analogWrite(MODRA, intenzita);
+break;
+}
+case 7: {
+analogWrite(CERVENA, intenzita);
+analogWrite(ZELENA, intenzita);
+analogWrite(MODRA, intenzita);
+break;
+}
+}
+ delay(5);
+    
+    if(intenzita == 0) {
+      smer = HIGH;
+    }
+    else if(intenzita == 255) {
+      smer = LOW; 
+    }
+    
+    if(smer == HIGH) {
+      intenzita++;
+    }
+    if(smer == LOW) {
+      intenzita--; 
+    }
+    
+    if(smer == HIGH && smer_pred == LOW) {
+      pin++;
+    }
+    smer_pred = smer;
+    if(pin == 8) {
+      pin = 1;
+    } 
+  }
+  
+  
+  else {
+intenzita = 0;
+analogWrite(CERVENA, intenzita);
+analogWrite(ZELENA, intenzita);
+analogWrite(MODRA, intenzita);
+  }
+}
