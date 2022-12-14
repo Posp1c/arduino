@@ -1,0 +1,49 @@
+//write a code to read rfid with arduino and an rfid scanner
+
+//include library
+#include <SPI.h>
+#include <MFRC522.h>
+
+//define the pins
+#define SS_PIN 10
+#define RST_PIN 9
+
+//create an instance of the rfid scanner
+MFRC522 mfrc522(SS_PIN, RST_PIN);
+
+//setup the arduino
+void setup() {
+  Serial.begin(9600);
+  SPI.begin();
+  mfrc522.PCD_Init();
+  Serial.println("Ready to scan your RFID card");
+}
+
+//loop the arduino
+void loop() {
+  // look for new cards
+  if ( ! mfrc522.PICC_IsNewCardPresent()) {
+    return;
+  }
+
+  // select one of the cards
+  if ( ! mfrc522.PICC_ReadCardSerial()) {
+    return;
+  }
+
+  //show the UID in the serial monitor
+  Serial.print("UID tag :");
+  String content= "";
+  byte letter;
+  for (byte i = 0; i < mfrc522.uid.size; i++) 
+  {
+     Serial.print(mfrc522.uid.uidByte[i] < 0x10 ? " 0" : " ");
+     Serial.print(mfrc522.uid.uidByte[i], HEX);
+     content.concat(String(mfrc522.uid.uidByte[i] < 0x10 ? " 0" : " "));
+     letter = mfrc522.uid.uidByte[i];
+     content.concat(String(letter, HEX));
+  }
+  Serial.println();
+  Serial.print("Message : ");
+  Serial.println(content);
+}
