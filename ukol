@@ -1,0 +1,52 @@
+const int ledPin = 13; // nastavení pinu LED
+const int timeUnit = 100; // časová jednotka pro blikání LED
+unsigned long ledOnTime = 0; // čas, kdy byla LED naposledy zapnutá
+bool transmissionInProgress = false; // příznak, zda probíhá přenos
+
+void setup() {
+  Serial.begin(19200); // nastavení rychlosti baudů na 19200
+  pinMode(ledPin, OUTPUT); // nastavení pinu LED jako výstup
+}
+
+void loop() {
+  if (Serial.available() > 0) {
+    char input = Serial.read(); // přečtení vstupu z monitoru série
+    if (input == '.') { // pokud je vstup tečka, blikni rychle
+      blinkLED(1, timeUnit);
+    } else if (input == '-') { // pokud je vstup pomlčka, zapni LED po dobu 300 ms
+      blinkLED(1, 3*timeUnit);; // nastavení času, kdy má LED zhasnout
+    } else { // jinak ignoruj vstup a počkej 100 ms
+      delay(100);
+    }
+  }
+  
+  // kontrola času a vypnutí LED
+  if (ledOnTime > 0 && millis() >= ledOnTime) {
+    digitalWrite(ledPin, LOW); // vypnutí LED
+    ledOnTime = 0; // reset času
+  }
+  
+  // pokud je přenos dokončen, vypiš zprávu a resetuj příznak
+  if (transmissionInProgress && !Serial.available()) {
+    Serial.println("Přenos dokončen");
+    transmissionInProgress = false;
+  }
+}
+
+void blinkLED(int numBlinks, int blinkTime) {
+  for (int i = 0; i < numBlinks; i++) {
+    digitalWrite(ledPin, HIGH); // zapnutí LED
+    unsigned long currentTime = millis(); // uložení aktuálního času
+    while (millis() - currentTime < blinkTime) {
+      // počkej podle rychlosti blikání, nevyužívá delay()
+    }
+    digitalWrite(ledPin, LOW); // vypnutí LED
+    currentTime = millis(); // uložení aktuálního času
+    while (millis() - currentTime < blinkTime) {
+      // počkej podle rychlosti blikání, nevyužívá delay()
+    }
+  }
+  
+  // nastavení příznaku, že probíhá přenos
+  transmissionInProgress = true;
+}
